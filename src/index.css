@@ -1,0 +1,301 @@
+@import 'tailwindcss';
+
+/* Tokens are named for their role, so the markup survives a palette change. */
+@theme {
+  --color-page: #f5f6fa;
+  --color-paper: #ffffff;
+  --color-ink: #0f1430;
+  --color-muted: #5b6278;
+  --color-line: #dde0ea;
+  --color-accent: #2e3094;
+  --color-accent-deep: #23256f;
+  --color-accent-soft: #e9eaf8;
+  --color-warn: #b4441c;
+
+  --font-sans: 'Onest', ui-sans-serif, system-ui, sans-serif;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  color-scheme: light;
+  --gutter: 20px;
+  --nav-space: 76px; /* replaced by the measured nav height */
+}
+
+@media (min-width: 640px) {
+  :root {
+    --gutter: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --gutter: 56px;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgb(46 48 148 / 0.18);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ---------- Layout ---------- */
+.frame {
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 90rem;
+}
+
+.hero-min {
+  min-height: calc(100dvh - var(--nav-space));
+}
+
+@media (max-width: 1023px) {
+  .hero-min {
+    min-height: 0;
+  }
+}
+
+/* ---------- Type ---------- */
+.display {
+  font-size: clamp(2.5rem, 1.1rem + 3.6vw, 4.35rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.h2 {
+  font-size: clamp(2rem, 1.3rem + 2vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.eyebrow {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.dot {
+  box-shadow: 0 0 0 4px rgb(46 48 148 / 0.14);
+}
+
+/* ---------- Background: warm paper, one soft light behind the visual ---------- */
+.hero-bg {
+  background:
+    radial-gradient(ellipse 60% 70% at 74% 52%, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0) 70%),
+    radial-gradient(ellipse 40% 45% at 78% 58%, rgb(46 48 148 / 0.07) 0%, rgb(46 48 148 / 0) 70%),
+    radial-gradient(ellipse 50% 40% at 100% 0%, rgb(226 229 240 / 0.7) 0%, rgb(226 229 240 / 0) 70%),
+    var(--color-page);
+}
+
+/* The floor grid: clearest beneath the visual, dissolving toward the headline. */
+.floor,
+.floor-lit {
+  --floor-area: radial-gradient(ellipse 75% 80% at 72% 70%, #000 20%, transparent 100%);
+  --floor-edges: linear-gradient(to left, transparent 0%, #000 22%), linear-gradient(to top, transparent 0%, #000 28%);
+  -webkit-mask-image: var(--floor-area), var(--floor-edges);
+  mask-image: var(--floor-area), var(--floor-edges);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.floor {
+  opacity: 0.4;
+}
+
+.floor-spot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  will-change: transform, opacity;
+  -webkit-mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 0%, transparent 100%);
+}
+
+.floor-lit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+[data-spot='on'] > .floor-spot {
+  opacity: 0.75;
+}
+
+@media (max-width: 1023px) {
+  .floor,
+  .floor-lit {
+    --floor-area: radial-gradient(ellipse 90% 60% at 50% 75%, #000 20%, transparent 100%);
+  }
+}
+
+/* ---------- Nav ---------- */
+.nav-bar {
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease;
+}
+
+.nav-bar-solid {
+  background-color: rgb(245 246 250 / 0.82);
+  border-bottom-color: rgb(15 20 48 / 0.07);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* ---------- Label flip: every button's label turns over like a cube on hover ---------- */
+.flip {
+  perspective: 600px;
+}
+
+.flip-box {
+  --d: 0.75em;
+  display: inline-grid;
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--d) * -1)) rotateX(0deg);
+  transition: transform 550ms var(--ease-out-soft);
+}
+
+.flip-face {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  height: 1.5em;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.5em;
+  backface-visibility: hidden;
+  transform: translateZ(var(--d));
+}
+
+.flip-back {
+  transform: rotateX(-90deg) translateZ(var(--d));
+}
+
+.flip:hover .flip-box,
+.flip:focus-visible .flip-box {
+  transform: translateZ(calc(var(--d) * -1)) rotateX(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flip-box {
+    transition: none;
+  }
+
+  .flip:hover .flip-box,
+  .flip:focus-visible .flip-box {
+    transform: translateZ(calc(var(--d) * -1));
+  }
+}
+
+/* ---------- Intro: CSS so the copy plays in from first paint, before hydration ---------- */
+.rise {
+  animation: rise 700ms var(--ease-out-soft) backwards;
+}
+
+.drop {
+  animation: drop 600ms var(--ease-out-soft) backwards;
+}
+
+.enter {
+  animation: enter 1100ms var(--ease-out-soft) 250ms backwards;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 18px;
+  }
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    translate: 0 -12px;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    scale: 0.97;
+  }
+}
+
+@keyframes float {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+.float {
+  animation: float 6.5s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .drop,
+  .enter,
+  .float {
+    animation: none;
+  }
+}
+
+/* ---------- Surfaces ---------- */
+.glass-card {
+  border: 1px solid rgb(15 20 48 / 0.07);
+  background: rgb(255 255 255 / 0.84);
+  box-shadow:
+    0 1px 2px rgb(40 45 70 / 0.04),
+    0 18px 40px -20px rgb(40 45 90 / 0.32),
+    inset 0 1px 0 rgb(255 255 255 / 0.9);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Product photographs sit on white studio backgrounds: multiply melts them into tinted surfaces. */
+.product-shot {
+  mix-blend-mode: multiply;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

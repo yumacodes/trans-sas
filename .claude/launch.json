@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "web", "runtimeExecutable": "npm", "runtimeArgs": ["run", "dev"], "port": 5174 },
+    {
+      "name": "mgt-api",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "F:/area 51/trans-sas-mgt", "--filter", "api", "dev"],
+      "port": 4000
+    },
+    {
+      "name": "mgt-web",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "F:/area 51/trans-sas-mgt", "--filter", "web", "dev"],
+      "port": 5173
+    }
+  ]
+}
