@@ -76,15 +76,15 @@ export function CartDrawer() {
             >
               <div className='flex items-center justify-between border-b border-line px-6 py-5'>
                 <h2 id='cart-title' className='text-[18px] font-medium tracking-[-0.01em]'>
-                  Your cart {count > 0 && <span className='text-muted tabular-nums'>({count})</span>}
+                  Your quote list {count > 0 && <span className='text-muted tabular-nums'>({count})</span>}
                 </h2>
                 <button
                   type='button'
                   onClick={close}
-                  aria-label='Close cart'
+                  aria-label='Close quote list'
                   className='grid size-11 place-items-center rounded-full text-ink hover:bg-ink/5'
                 >
-                  <X className='size-5' strokeWidth={1.6} />
+                  <X className='size-5' strokeWidth={1.6} aria-hidden />
                 </button>
               </div>
 
@@ -93,8 +93,8 @@ export function CartDrawer() {
                   <span className='grid size-14 place-items-center rounded-full bg-accent-soft text-accent'>
                     <ShoppingBag className='size-6' strokeWidth={1.5} aria-hidden />
                   </span>
-                  <p className='text-[17px] font-medium'>Your cart is empty</p>
-                  <p className='text-[14.5px] text-muted'>Add equipment from the shop and send us one request for a proforma.</p>
+                  <p className='text-[17px] font-medium'>Your quote list is empty</p>
+                  <p className='text-[14.5px] text-muted'>Add equipment from the shop and send us one quote request. We reply with a proforma.</p>
                   <LinkButton to='/shop' onClick={close} className='mt-2'>
                     Browse equipment
                   </LinkButton>
@@ -109,15 +109,15 @@ export function CartDrawer() {
                       Nothing is paid online. We reply with a proforma invoice showing prices and availability.
                     </p>
                     <div className='mt-4 grid grid-cols-2 gap-2'>
-                      <LinkButton to='/cart' variant='outline' onClick={close}>
-                        View cart
+                      <LinkButton to='/quote' variant='outline' onClick={close}>
+                        View list
                       </LinkButton>
-                      <LinkButton to='/checkout' onClick={close}>
-                        Send request
+                      <LinkButton to='/quote/send' onClick={close}>
+                        Request quote
                       </LinkButton>
                     </div>
                     <Link to='/shop' onClick={close} className='mt-3 block text-center text-[14px] text-muted hover:text-ink'>
-                      Continue shopping
+                      Keep browsing
                     </Link>
                   </div>
                 </>

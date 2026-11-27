@@ -1,12 +1,14 @@
 import { ArrowRight } from 'lucide-react'
 import { LinkButton } from '@/components/ui/button'
 import { PageHeader, SectionHeading } from '@/components/site/layout'
+import { DeliveryNote, TrustBand } from '@/components/site/trust-band'
+import { usePageMeta } from '@/lib/use-page-meta'
 
 const TIMELINE = [
   { year: '1981', title: 'Founded', body: 'Trans-Sas Trading & Manufacturing begins in Accra, working in large-scale farming and gari processing.' },
   { year: 'Then', title: 'Into medical supply', body: 'Seeing what hospitals were missing, the company turns its trading experience to medical equipment and consumables.' },
   { year: '35+ yrs', title: 'Public and private care', body: 'Supplying government projects, government and private hospitals, health professionals and families.' },
-  { year: 'Today', title: 'Supply, delivery, repair', body: 'One team that sources the equipment, delivers it free, and repairs it when it breaks.' }
+  { year: 'Today', title: 'Supply, delivery, repair', body: 'One team that sources the equipment, delivers it, and repairs it when it breaks.' }
 ]
 
 const VALUES = [
@@ -21,6 +23,11 @@ const VALUES = [
 ]
 
 export default function AboutPage() {
+  usePageMeta({
+    title: 'About us',
+    description: 'Trans-Sas Trading & Manufacturing Co. Ltd., Accra: medical equipment and non-drug consumables for hospitals, clinics and families across Ghana since 1981.'
+  })
+
   return (
     <>
       <PageHeader
@@ -45,7 +52,8 @@ export default function AboutPage() {
             individual buyers. We stand apart through the quality of what we sell and how quickly we deliver it.
           </p>
         </div>
-        <dl className='grid grid-cols-2 gap-px self-start overflow-hidden rounded-3xl border border-line bg-line'>
+        <div className='self-start'>
+        <dl className='grid grid-cols-2 gap-px overflow-hidden rounded-3xl border border-line bg-line'>
           {[
             ['1981', 'Established'],
             ['35+', 'Years in medical supply'],
@@ -58,7 +66,11 @@ export default function AboutPage() {
             </div>
           ))}
         </dl>
+        <DeliveryNote className='mt-3' />
+        </div>
       </section>
+
+      <TrustBand className='frame -mt-8 pb-20 lg:-mt-12 lg:pb-28' />
 
       <section className='border-y border-line/70 bg-white/60'>
         <div className='frame grid gap-12 py-20 lg:grid-cols-2 lg:gap-20 lg:py-24'>

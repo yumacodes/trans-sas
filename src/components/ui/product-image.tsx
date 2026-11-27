@@ -8,10 +8,16 @@ type ProductImageProps = {
   className?: string
   imgClassName?: string
   eager?: boolean
+  /** Rendered width hint for the browser, as an `<img sizes>` value. */
+  sizes?: string
 }
 
+// Intrinsic size hint. The image always fills its plate (object-contain), and every plate
+// has a fixed aspect ratio or size, so nothing shifts while photos load.
+const BOX = 800
+
 /** A product photo on a soft tinted plate, with a quiet fallback when there's no image or it fails. */
-export function ProductImage({ src, alt, className, imgClassName, eager }: ProductImageProps) {
+export function ProductImage({ src, alt, className, imgClassName, eager, sizes = '(min-width: 1280px) 22vw, (min-width: 768px) 30vw, 50vw' }: ProductImageProps) {
   const [failed, setFailed] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
@@ -21,7 +27,11 @@ export function ProductImage({ src, alt, className, imgClassName, eager }: Produ
         <img
           src={src}
           alt={alt}
+          width={BOX}
+          height={BOX}
+          sizes={sizes}
           loading={eager ? 'eager' : 'lazy'}
+          fetchPriority={eager ? 'high' : undefined}
           decoding='async'
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}

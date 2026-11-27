@@ -5,15 +5,32 @@ import { MessageCircle } from 'lucide-react'
 import { Navbar } from '@/components/site/navbar'
 import { Footer } from '@/components/site/footer'
 import { CartDrawer } from '@/components/site/cart-drawer'
-import { COMPANY } from '@/lib/company'
+import { QuoteListSync } from '@/components/site/cart-lines'
+import { whatsappHref } from '@/lib/company'
 import { cn } from '@/lib/utils'
 
 function ScrollToTop() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
 
   useEffect(() => {
+    if (hash) {
+      // Lazy pages render a moment later, so the anchor is looked for over a few frames.
+      let tries = 0
+      let frame = 0
+      const find = () => {
+        const el = document.getElementById(decodeURIComponent(hash.slice(1)))
+
+        if (el) el.scrollIntoView({ block: 'start' })
+        else if (tries++ < 30) frame = requestAnimationFrame(find)
+      }
+
+      find()
+
+      return () => cancelAnimationFrame(frame)
+    }
+
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
-  }, [pathname])
+  }, [pathname, hash])
 
   return null
 }
@@ -28,6 +45,7 @@ export function Layout() {
         Skip to content
       </a>
       <ScrollToTop />
+      <QuoteListSync />
       <Navbar />
       <main id='main' className='flex-1'>
         <Outlet />
@@ -35,7 +53,7 @@ export function Layout() {
       <Footer />
       <CartDrawer />
       <a
-        href={`${COMPANY.whatsapp}?text=${encodeURIComponent("Hello, I'm interested in one of your products")}`}
+        href={whatsappHref("Hello, I'm interested in one of your products")}
         target='_blank'
         rel='noreferrer'
         aria-label='Chat with us on WhatsApp'

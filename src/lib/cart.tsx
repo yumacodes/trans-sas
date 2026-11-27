@@ -12,6 +12,10 @@ type CartContextValue = {
   setQty: (slug: string, qty: number) => void
   remove: (slug: string) => void
   clear: () => void
+  /** Puts back a list removed by clear (the Undo after "Clear list"). */
+  restore: (lines: CartLine[]) => void
+  /** Drops lines whose product is no longer in the catalogue. */
+  prune: (keep: (slug: string) => boolean) => void
   drawerOpen: boolean
   setDrawerOpen: (open: boolean) => void
 }
@@ -39,7 +43,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(KEY, JSON.stringify(lines))
     } catch {
-      // Storage unavailable (private mode): the cart still works for this visit.
+      // Storage unavailable (private mode): the quote list still works for this visit.
     }
   }, [lines])
 
@@ -59,10 +63,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const remove = useCallback((slug: string) => setLines(prev => prev.filter(l => l.slug !== slug)), [])
   const clear = useCallback(() => setLines([]), [])
+  const restore = useCallback((saved: CartLine[]) => setLines(saved), [])
+  const prune = useCallback(
+    (keep: (slug: string) => boolean) => setLines(prev => (prev.every(l => keep(l.slug)) ? prev : prev.filter(l => keep(l.slug)))),
+    []
+  )
 
   const value = useMemo(
-    () => ({ lines, count: lines.reduce((n, l) => n + l.qty, 0), add, setQty, remove, clear, drawerOpen, setDrawerOpen }),
-    [lines, add, setQty, remove, clear, drawerOpen]
+    () => ({ lines, count: lines.reduce((n, l) => n + l.qty, 0), add, setQty, remove, clear, restore, prune, drawerOpen, setDrawerOpen }),
+    [lines, add, setQty, remove, clear, restore, prune, drawerOpen]
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>

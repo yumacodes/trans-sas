@@ -3,7 +3,7 @@ import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from 'rea
 import { cn } from '@/lib/utils'
 
 const control =
-  'w-full rounded-xl border border-line bg-white px-4 text-[16px] text-ink placeholder:text-muted/70 transition-[border-color,box-shadow] duration-200 hover:border-ink/25 focus:border-accent focus:shadow-[0_0_0_4px_rgb(46_48_148/0.12)] focus:outline-none aria-[invalid=true]:border-warn'
+  'w-full rounded-xl border border-line bg-white px-4 text-[16px] text-ink placeholder:text-muted transition-[border-color,box-shadow] duration-200 hover:border-ink/25 focus:border-accent focus:shadow-[0_0_0_4px_rgb(46_48_148/0.12)] focus:outline-none aria-[invalid=true]:border-warn'
 
 type FieldShellProps = { label: string; hint?: string; error?: string; optional?: boolean; id: string; children: ReactNode }
 

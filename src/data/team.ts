@@ -144,3 +144,15 @@ export const initials = (name: string) =>
     .slice(0, 2)
     .map(w => w[0]!.toUpperCase())
     .join('')
+
+/** An entry still holding template text ("Full Name", "+233 00 000 0000", "name@…"). */
+const isPlaceholder = (m: TeamMember) =>
+  /^full name$/i.test(m.name.trim()) || /\b00 000 0000\b/.test(m.phone ?? '') || /^name@/i.test(m.email ?? '')
+
+/**
+ * The people actually shown. While every entry is a template the Team page and every link
+ * to it stay hidden (the /team route redirects to About).
+ */
+export const PUBLISHED_TEAM = TEAM.filter(m => !isPlaceholder(m))
+
+export const hasTeam = PUBLISHED_TEAM.length > 0

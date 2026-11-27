@@ -26,7 +26,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A sturdy mobile examination couch for consulting rooms and wards. The backrest adjusts and locks in eight positions, and the frame is built for years of daily use.',
     features: ['Backrest lockable in 8 positions', 'Mobile frame for easy repositioning', 'Built for heavy daily use'],
-    image: '/products/mobile-medical-couch.png'
+    image: '/products/mobile-medical-couch.webp'
   },
   {
     slug: 'self-propelled-wheelchair',
@@ -36,7 +36,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A lightweight folding aluminium wheelchair in metallic burgundy. Flip-up desk-length arms let the user get close to tables, and the footrests swing away and lift off for transfers.',
     features: ['Folding aluminium frame', 'Flip-up, under-desk arms', 'Swing-away removable footrests'],
-    image: '/products/self-propelled-wheelchair.png'
+    image: '/products/self-propelled-wheelchair.webp'
   },
   {
     slug: 'transit-wheelchair',
@@ -46,7 +46,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A folding transit chair for moving patients around a facility or between appointments. Removable armrests and swing-away footrests make transfers easier, and the inner liners are heavy duty.',
     features: ['Full or desk arms, removable', 'Swing-away footrests', 'Heavy-duty inner liners', 'Folds for transport'],
-    image: '/products/transit-wheelchair.png'
+    image: '/products/transit-wheelchair.webp'
   },
   {
     slug: 'lightweight-safety-walker',
@@ -56,7 +56,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A folding safety walker that gives support on the move and a place to rest. Handles adjust in height, and it folds flat for storage or the car boot.',
     features: ['Folds flat', 'Height-adjustable handles', 'Padded seat and backrest', 'Storage bag included'],
-    image: '/products/lightweight-safety-walker.png'
+    image: '/products/lightweight-safety-walker.webp'
   },
   {
     slug: 'minor-surgery-couch',
@@ -66,7 +66,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A couch for minor surgical procedures. The backrest and foot section adjust manually and lock themselves in place, and the couch tilts head-down when needed.',
     features: ['Self-locking backrest and foot section', 'Head-down tilt', 'Manual adjustment, no power needed'],
-    image: '/products/minor-surgery-couch.png'
+    image: '/products/minor-surgery-couch.webp'
   },
   {
     slug: 'mobile-commode-chair',
@@ -76,7 +76,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A mobile commode chair that doubles as a shower chair, for moving patients safely to and from the bathroom.',
     features: ['Castors for safe transfer', 'Suitable for shower use'],
-    image: '/products/mobile-commode-chair.png'
+    image: '/products/mobile-commode-chair.webp'
   },
   {
     slug: 'coolview-c35-examination-light',
@@ -86,7 +86,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'An examination light with two modes: an intense 20,000 lux spot for detailed work and a gentle 5,000 lux flood for general examination, from a 35 W source.',
     features: ['20,000 lux spot', '5,000 lux floodlight', '35 W light source'],
-    image: '/products/coolview-c35-examination-light.png'
+    image: '/products/coolview-c35-examination-light.webp'
   },
   {
     slug: 'zenith-ultra-500la-microscope',
@@ -96,7 +96,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A binocular laboratory microscope with paired ×10 DIN widefield eyepieces and parfocal DIN-standard objectives. Magnification runs from ×40 to ×1000, or ×1600 with optional ×16 flatfield eyepieces.',
     features: ['×40 – ×1000 magnification', '×10 DIN widefield eyepieces, 18 mm field', 'DIN-standard parfocal objectives', 'Optional ×16 eyepieces for ×1600'],
-    image: '/products/zenith-ultra-500la-microscope.png'
+    image: '/products/zenith-ultra-500la-microscope.webp'
   },
   {
     slug: 'autoclaves-decontamination',
@@ -106,7 +106,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'Sterilisation and decontamination supplies, including antimicrobial hospital concentrate for general antiseptic use. Ask our team for the full range.',
     features: ['Hospital-grade antiseptic concentrate', 'Range available on request'],
-    image: '/products/autoclaves-decontamination.png'
+    image: '/products/autoclaves-decontamination.webp'
   },
   {
     slug: '3m-littmann-electronic-stethoscope',
@@ -116,7 +116,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'An electronic stethoscope that amplifies sound up to 18 times, made for heart and body sounds that are hard to hear with an acoustic chest piece.',
     features: ['Up to 18× amplification', 'For difficult-to-hear heart and body sounds'],
-    image: '/products/3m-littmann-electronic-stethoscope.png'
+    image: '/products/3m-littmann-electronic-stethoscope.webp'
   },
   {
     slug: 'accoson-freestyle-sphygmomanometer',
@@ -126,7 +126,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A blood pressure monitor with a plastic manometer tube and a mercury isolation valve, supplied with an adult velcro cuff, a latex-free bulb and coiled tubing.',
     features: ['Mercury isolation valve', 'Adult velcro cuff', 'Latex-free bulb', 'Coiled tubing'],
-    image: '/products/accoson-freestyle-sphygmomanometer.png'
+    image: '/products/accoson-freestyle-sphygmomanometer.webp'
   },
   {
     slug: 'microlab-mk6-spirometer',
@@ -136,7 +136,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A portable, lightweight spirometer in a high-impact ABS body, powered by rechargeable internal batteries for use away from the desk.',
     features: ['Portable and lightweight', 'Rechargeable internal batteries', 'High-impact ABS body'],
-    image: '/products/microlab-mk6-spirometer.png'
+    image: '/products/microlab-mk6-spirometer.webp'
   },
   {
     slug: 'elemental-mains-cautery-unit',
@@ -146,7 +146,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A mains-powered cautery unit with variable output up to 20 amperes, robust cables and handles, and non-slip feet.',
     features: ['Variable output up to 20 A', 'Robust cables and handles', 'Non-slip feet'],
-    image: '/products/elemental-mains-cautery-unit.png'
+    image: '/products/elemental-mains-cautery-unit.webp'
   },
   {
     slug: 'accu-chek-advantage-meter',
@@ -156,7 +156,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A complete blood glucose kit: the Accu-Chek Advantage meter with a Softclix finger pricker, 10 test strips, 10 lancets, and high and low control solutions.',
     features: ['Softclix finger pricker', '10 test strips, 10 lancets', 'High and low control solutions'],
-    image: '/products/accu-chek-advantage-meter.png'
+    image: '/products/accu-chek-advantage-meter.webp'
   },
   {
     slug: 'kamplex-kt20-impedance-audiometer',
@@ -165,7 +165,7 @@ export const CATALOG: CatalogEntry[] = [
     summary: 'Hand-held tympanometer for middle-ear testing in children.',
     description: 'A hand-held tympanometer for testing middle-ear function, designed for use with young children.',
     features: ['Hand-held', 'Middle-ear testing', 'Suited to paediatric use'],
-    image: '/products/kamplex-kt20-impedance-audiometer.png'
+    image: '/products/kamplex-kt20-impedance-audiometer.webp'
   },
   {
     slug: 'a-ub401-digital-wrist-monitor',
@@ -175,7 +175,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'An ultra-compact wrist blood pressure monitor. Its three-line display shows systolic, diastolic and pulse readings together.',
     features: ['Ultra-compact and light', '3-line display', 'Systolic, diastolic and pulse together'],
-    image: '/products/a-ub401-digital-wrist-monitor.png'
+    image: '/products/a-ub401-digital-wrist-monitor.webp'
   },
   {
     slug: 'polaroid-healthcam-kit',
@@ -185,7 +185,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'Instant clinical photographs with a grid overlay for recording wounds and conditions. The kit includes the camera, twin-pack grid film, a shoulder bag, a light lock and a non-contact close-up lens.',
     features: ['Grid overlay on every print', 'Non-contact close-up lens', 'Shoulder bag and light lock included'],
-    image: '/products/polaroid-healthcam-kit.png'
+    image: '/products/polaroid-healthcam-kit.webp'
   },
   {
     slug: 'polaroid-macro-5-slr',
@@ -203,7 +203,7 @@ export const CATALOG: CatalogEntry[] = [
     summary: 'Comfortable, easy-to-fit collar for a range of cervical injuries.',
     description: 'An economical cervical collar that is comfortable to wear and quick to apply, for a variety of cervical injuries.',
     features: ['Quick to apply', 'Comfortable fit', 'Economical'],
-    image: '/products/universal-cervical-collar.png'
+    image: '/products/universal-cervical-collar.webp'
   },
   {
     slug: 'drive-heavy-duty-suction-machine',
@@ -213,7 +213,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A heavy-duty suction machine built for continuous use. It has an anti-bacterial filter, a vacuum regulator, an anti-vibration gauge, and a collection bottle with overflow protection.',
     features: ['Continuous operation', 'Oil-less pump', 'Anti-bacterial filter', 'Overflow-protected collection bottle'],
-    image: '/products/drive-heavy-duty-suction-machine.png'
+    image: '/products/drive-heavy-duty-suction-machine.webp'
   },
   {
     slug: 'closed-infant-incubator',
@@ -223,7 +223,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A stationary closed incubator for standard and intermediate infant care, with simple controls and easy access to the patient.',
     features: ['Standard and intermediate care', 'Simple operation', 'Easy patient access'],
-    image: '/products/closed-infant-incubator.png'
+    image: '/products/closed-infant-incubator.webp'
   },
   {
     slug: 'microcomputer-anesthesia-machine',
@@ -233,7 +233,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'An anaesthesia workstation that brings monitoring, anaesthesia delivery and care-process records into one system, with the option to connect to a hospital server.',
     features: ['Integrated monitoring', 'Care-process records', 'Server connectivity'],
-    image: '/products/microcomputer-anesthesia-machine.png'
+    image: '/products/microcomputer-anesthesia-machine.webp'
   },
   {
     slug: 'infrared-foot-massager',
@@ -243,7 +243,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A therapeutic foot massager that combines high-frequency massage with adjustable infrared heat and eight natural magnets to support blood circulation.',
     features: ['High-frequency massage', 'Adjustable infrared heat', '8 natural magnets'],
-    image: '/products/infrared-foot-massager.png'
+    image: '/products/infrared-foot-massager.webp'
   },
   {
     slug: 'massage-chair',
@@ -253,7 +253,7 @@ export const CATALOG: CatalogEntry[] = [
     description:
       'A full massage chair with a 3D mechanism, air massage, three massage and stretching techniques, and heated massage heads.',
     features: ['3D massage mechanism', 'Air massage', '3 massage and stretch techniques', 'Heated massage heads'],
-    image: '/products/massage-chair.png'
+    image: '/products/massage-chair.webp'
   }
 ]
 

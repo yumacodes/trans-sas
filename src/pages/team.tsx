@@ -1,41 +1,18 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { ArrowRight, Check, Copy, Mail, MessageCircle, Phone } from 'lucide-react'
+import { ArrowRight, Mail, MessageCircle, Phone } from 'lucide-react'
 import { LinkButton } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
 import { PageHeader } from '@/components/site/layout'
 import { TeamCard, TeamPhoto } from '@/components/site/team-card'
-import { DEPARTMENTS, TEAM } from '@/data/team'
+import { DEPARTMENTS, PUBLISHED_TEAM as TEAM } from '@/data/team'
+import { CopyButton } from '@/components/ui/copy-button'
+import { usePageMeta } from '@/lib/use-page-meta'
 import type { TeamMember } from '@/data/team'
 import { COMPANY, telHref } from '@/lib/company'
 import { cn } from '@/lib/utils'
 
 const whatsappNumber = (phone: string) => phone.replace(/[^\d]/g, '')
-
-function CopyButton({ value, label }: { value: string; label: string }) {
-  const [copied, setCopied] = useState(false)
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(value)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1600)
-    } catch {
-      // Clipboard blocked: the value is still visible to select by hand.
-    }
-  }
-
-  return (
-    <button
-      type='button'
-      onClick={copy}
-      aria-label={copied ? `${label} copied` : `Copy ${label}`}
-      className='grid size-10 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-ink/5 hover:text-ink'
-    >
-      {copied ? <Check className='size-4 text-accent' aria-hidden /> : <Copy className='size-4' aria-hidden />}
-    </button>
-  )
-}
 
 function ContactRow({ icon: Icon, label, value, href }: { icon: typeof Mail; label: string; value: string; href: string }) {
   return (
@@ -125,6 +102,7 @@ function MemberProfile({ member }: { member: TeamMember }) {
 }
 
 export default function TeamPage() {
+  usePageMeta({ title: 'Our team', description: 'The Trans-Sas sales, technical, finance and logistics team, and how to reach each of them.' })
   const [params, setParams] = useSearchParams()
   const department = params.get('department') ?? 'All'
   // ?member=<id> opens a profile, so a person's card can be linked to directly.

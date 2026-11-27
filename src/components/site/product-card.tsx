@@ -30,7 +30,7 @@ export function ProductCard({ product, className }: { product: Product; classNam
       <button
         type='button'
         onClick={handleAdd}
-        aria-label={added ? `${product.name} added to cart` : `Add ${product.name} to cart`}
+        aria-label={added ? `${product.name} added to your quote list` : `Add ${product.name} to your quote list`}
         className={cn(
           'absolute top-3 right-3 grid size-11 place-items-center rounded-full border shadow-sm backdrop-blur transition-all duration-200',
           added ? 'border-accent bg-accent text-white' : 'border-white bg-white/85 text-ink hover:bg-ink hover:text-white'

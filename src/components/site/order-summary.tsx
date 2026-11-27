@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { FileText } from 'lucide-react'
 import { useResolvedCart } from '@/components/site/cart-lines'
+import { DeliveryNote } from '@/components/site/trust-band'
 
 /** What will be sent: products and quantities. Prices come on the proforma, never here. */
 export function OrderSummary({ children, showLines = false }: { children?: ReactNode; showLines?: boolean }) {
@@ -8,7 +9,7 @@ export function OrderSummary({ children, showLines = false }: { children?: React
 
   return (
     <aside className='h-fit rounded-3xl border border-line bg-white p-6 lg:sticky lg:top-[calc(var(--nav-space)+24px)]'>
-      <h2 className='text-[18px] font-medium tracking-[-0.01em]'>Your request</h2>
+      <h2 className='text-[18px] font-medium tracking-[-0.01em]'>Your quote request</h2>
 
       {showLines && (
         <ul className='mt-5 space-y-3 border-b border-line pb-5 text-[14.5px]'>
@@ -35,6 +36,7 @@ export function OrderSummary({ children, showLines = false }: { children?: React
           <dd className='text-accent'>Free</dd>
         </div>
       </dl>
+      <DeliveryNote className='mt-2 text-right' />
 
       <p className='mt-5 flex gap-2.5 rounded-xl bg-accent-soft/70 p-3.5 text-[13.5px] leading-relaxed text-ink/80'>
         <FileText className='mt-0.5 size-4 shrink-0 text-accent' aria-hidden />

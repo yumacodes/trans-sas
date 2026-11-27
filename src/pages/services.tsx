@@ -1,9 +1,12 @@
 import { ArrowRight, ClipboardList, PackageCheck, ShieldCheck, Truck, Wrench } from 'lucide-react'
 import { LinkButton } from '@/components/ui/button'
 import { PageHeader, SectionHeading } from '@/components/site/layout'
+import { COMPANY } from '@/lib/company'
+import { usePageMeta } from '@/lib/use-page-meta'
 
 const SERVICES = [
   {
+    id: 'supply',
     icon: ShieldCheck,
     title: 'Supply of medical equipment & consumables',
     body: 'Hospital furniture, diagnostics, theatre, laboratory and neonatal equipment, plus non-drug consumables. For government projects, private facilities, health professionals and home care.',
@@ -11,13 +14,15 @@ const SERVICES = [
     cta: { label: 'Browse the shop', to: '/shop' }
   },
   {
+    id: 'delivery',
     icon: Truck,
     title: 'Free delivery',
-    body: 'Equipment orders are delivered free. Fast, dependable delivery is what our customers know us for.',
+    body: `Equipment orders are delivered free. Fast, dependable delivery is what our customers know us for. ${COMPANY.deliveryNote}`,
     points: ['Delivered to your facility or home', 'Scheduled around your opening', 'Pickup available in Accra'],
-    cta: { label: 'Start an order', to: '/shop' }
+    cta: { label: 'Start a quote', to: '/shop' }
   },
   {
+    id: 'repairs',
     icon: Wrench,
     title: 'Repairs of broken equipment',
     body: 'Equipment that has stopped working is expensive to replace. Tell us the make, model and fault and we will get it back into service.',
@@ -27,13 +32,18 @@ const SERVICES = [
 ]
 
 const STEPS = [
-  { icon: ClipboardList, title: 'Tell us what you need', body: 'Add items to your cart, send a list, or call. A tender document works too.' },
+  { icon: ClipboardList, title: 'Tell us what you need', body: 'Add items to your quote list, send a list, or call. A tender document works too.' },
   { icon: PackageCheck, title: 'We confirm and quote', body: 'Our sales team confirms models, availability and pricing with you.' },
-  { icon: Truck, title: 'We deliver', body: 'Free delivery to your facility, at a time that suits you.' },
+  { icon: Truck, title: 'We deliver', body: `Delivery to your facility, at a time that suits you. ${COMPANY.deliveryNote}` },
   { icon: Wrench, title: 'We stay on call', body: 'If something breaks, the same team repairs it.' }
 ]
 
 export default function ServicesPage() {
+  usePageMeta({
+    title: 'Services',
+    description: 'Supply of medical equipment and consumables, delivery to your facility, and repairs of broken equipment, from one team in Accra.'
+  })
+
   return (
     <>
       <PageHeader
@@ -47,8 +57,8 @@ export default function ServicesPage() {
       />
 
       <section className='frame space-y-4 py-16 lg:py-24'>
-        {SERVICES.map(({ icon: Icon, title, body, points, cta }, i) => (
-          <article key={title} className='grid gap-8 rounded-3xl border border-line bg-white p-6 sm:p-8 lg:grid-cols-[auto_1.2fr_1fr] lg:gap-14 lg:p-10'>
+        {SERVICES.map(({ id, icon: Icon, title, body, points, cta }, i) => (
+          <article key={title} id={id} className='scroll-mt-[calc(var(--nav-space)+16px)] grid gap-8 rounded-3xl border border-line bg-white p-6 sm:p-8 lg:grid-cols-[auto_1.2fr_1fr] lg:gap-14 lg:p-10'>
             <div className='flex items-center gap-4 lg:flex-col lg:items-start'>
               <span className='text-[13px] text-muted tabular-nums'>{String(i + 1).padStart(2, '0')}</span>
               <span className='grid size-12 place-items-center rounded-2xl bg-accent-soft text-accent'>

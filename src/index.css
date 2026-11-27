@@ -219,37 +219,36 @@ body {
   }
 }
 
-/* ---------- Intro: CSS so the copy plays in from first paint, before hydration ---------- */
+/* ---------- Intro ----------
+   Content is visible from the first paint: these only nudge position/scale, never opacity,
+   so nothing is hidden while scripts or lazy routes load. Off for reduced motion (below). */
 .rise {
-  animation: rise 700ms var(--ease-out-soft) backwards;
+  animation: rise 500ms var(--ease-out-soft) backwards;
 }
 
 .drop {
-  animation: drop 600ms var(--ease-out-soft) backwards;
+  animation: drop 400ms var(--ease-out-soft) backwards;
 }
 
 .enter {
-  animation: enter 1100ms var(--ease-out-soft) 250ms backwards;
+  animation: enter 700ms var(--ease-out-soft) backwards;
 }
 
 @keyframes rise {
   from {
-    opacity: 0;
-    translate: 0 18px;
+    translate: 0 10px;
   }
 }
 
 @keyframes drop {
   from {
-    opacity: 0;
-    translate: 0 -12px;
+    translate: 0 -6px;
   }
 }
 
 @keyframes enter {
   from {
-    opacity: 0;
-    scale: 0.97;
+    scale: 0.985;
   }
 }
 
