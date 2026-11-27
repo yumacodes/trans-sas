@@ -1,39 +1,71 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, ArrowUpRight, Baby, HeartPulse, Microscope, Scissors, ShieldCheck, Truck, Wrench, Accessibility } from 'lucide-react'
+import {
+  Accessibility,
+  ArrowRight,
+  ArrowUpRight,
+  Baby,
+  Bed,
+  FlaskConical,
+  HeartPulse,
+  Microscope,
+  Package,
+  Scissors,
+  ShieldCheck,
+  Stethoscope,
+  Truck,
+  Wrench
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import ProductStageHero from '@/components/ui/product-stage-hero'
 import { LinkButton } from '@/components/ui/button'
 import { SectionHeading } from '@/components/site/layout'
 import { ProductCard, ProductCardSkeleton } from '@/components/site/product-card'
 import { HERO_SLUGS } from '@/data/catalog'
-import { useProducts } from '@/lib/use-products'
+import { categoriesOf, useProducts } from '@/lib/use-products'
 import { COMPANY, telHref } from '@/lib/company'
+import { cn } from '@/lib/utils'
+import { usePageMeta } from '@/lib/use-page-meta'
+import type { Product } from '@/lib/types'
 
-const RANGES = [
-  { title: 'Mobility & patient handling', body: 'Wheelchairs, walkers, commode chairs and couches.', icon: Accessibility, to: '/shop?q=chair' },
-  { title: 'Diagnostics', body: 'Stethoscopes, BP monitors, spirometers, glucose meters, audiometers.', icon: HeartPulse, to: '/shop?category=Medical' },
-  { title: 'Theatre & surgical', body: 'Minor surgery couches, examination lights, cautery and suction.', icon: Scissors, to: '/shop?category=Surgical' },
-  { title: 'Laboratory & scientific', body: 'Microscopes and instruments for clinical labs.', icon: Microscope, to: '/shop?category=Scientific' },
-  { title: 'Neonatal & critical care', body: 'Infant incubators and anaesthesia workstations.', icon: Baby, to: '/shop/closed-infant-incubator' }
+/** An icon for a category, guessed from its name; anything unmatched gets a neutral box. */
+const CATEGORY_ICONS: [RegExp, LucideIcon][] = [
+  [/mobil|wheel|walk|chair|patient/i, Accessibility],
+  [/diagnos|monitor|medical/i, HeartPulse],
+  [/surg|theat|cauter/i, Scissors],
+  [/lab|scien|micro/i, Microscope],
+  [/neonat|infant|baby|matern/i, Baby],
+  [/furnit|bed|couch/i, Bed],
+  [/consum|steril|disinf/i, FlaskConical],
+  [/exam|stetho|clinic/i, Stethoscope]
 ]
+
+const iconFor = (category: string) => CATEGORY_ICONS.find(([re]) => re.test(category))?.[1] ?? Package
+
+const HERO_COUNT = 5
+
+/** Hero products: the curated slugs that exist in the live catalogue, else the first products with photos. */
+function heroProductsFrom(products: Product[]) {
+  const curated = HERO_SLUGS.map(slug => products.find(p => p.slug === slug && p.image)).filter((p): p is Product => Boolean(p))
+
+  return curated.length >= 2 ? curated : products.filter(p => p.image).slice(0, HERO_COUNT)
+}
 
 const SERVICES = [
   { title: 'Supply', body: 'Medical equipment and non-drug consumables for public projects, private facilities and individual buyers.', icon: ShieldCheck },
-  { title: 'Free delivery', body: 'We deliver equipment orders to your facility, and pride ourselves on how quickly we do it.', icon: Truck },
+  { title: 'Free delivery', body: `We deliver equipment orders to your facility, and pride ourselves on how quickly we do it. ${COMPANY.deliveryNote}`, icon: Truck },
   { title: 'Repairs', body: 'Broken equipment comes back into service. Tell us the make and the fault and we take it from there.', icon: Wrench }
 ]
 
 export default function HomePage() {
-  const { data: products, loading } = useProducts()
-  const heroProducts = HERO_SLUGS.map(s => products.find(p => p.slug === s)).filter((p): p is NonNullable<typeof p> => Boolean(p))
+  usePageMeta({})
+  const { data: products, loading, error, reload } = useProducts()
+  const heroProducts = heroProductsFrom(products)
   const featured = products.filter(p => p.image).slice(0, 8)
+  const categories = categoriesOf(products).slice(0, 5)
 
   return (
     <>
-      {heroProducts.length > 0 ? (
-        <ProductStageHero products={heroProducts} />
-      ) : (
-        <div className='hero-min hero-bg' aria-busy='true' />
-      )}
+      <ProductStageHero products={heroProducts} loading={loading} />
 
       {/* Who we serve: a quiet band of facts instead of fake logos. */}
       <section aria-label='Who we serve' className='border-y border-line/70 bg-white/60'>
@@ -62,23 +94,55 @@ export default function HomePage() {
             </LinkButton>
           }
         />
-        <ul className='mt-12 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-5'>
-          {RANGES.map(({ title, body, icon: Icon, to }) => (
-            <li key={title} className='bg-page'>
-              <Link to={to} className='group flex h-full flex-col p-6 transition-colors duration-300 hover:bg-white lg:p-7'>
-                <span className='grid size-11 place-items-center rounded-xl bg-accent-soft text-accent'>
-                  <Icon className='size-5' strokeWidth={1.6} aria-hidden />
-                </span>
-                <h3 className='mt-8 text-[17px] leading-snug font-medium tracking-[-0.01em]'>{title}</h3>
-                <p className='mt-2 text-[14px] leading-relaxed text-muted'>{body}</p>
-                <span className='mt-6 inline-flex items-center gap-1 text-[14px] font-medium text-ink'>
-                  Explore
-                  <ArrowUpRight className='size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5' aria-hidden />
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {loading ? (
+          <ul aria-hidden className='mt-12 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-5'>
+            {Array.from({ length: 5 }, (_, i) => (
+              <li key={i} className='h-52 animate-pulse bg-page' />
+            ))}
+          </ul>
+        ) : categories.length > 0 ? (
+          <ul
+            className={cn(
+              'mt-12 grid gap-px overflow-hidden rounded-3xl border border-line bg-line sm:grid-cols-2',
+              categories.length >= 5 ? 'lg:grid-cols-5' : categories.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'
+            )}
+          >
+            {categories.map(({ name, count }) => {
+              const Icon = iconFor(name)
+
+              return (
+                <li key={name} className='bg-page'>
+                  <Link
+                    to={`/shop?category=${encodeURIComponent(name)}`}
+                    className='group flex h-full flex-col p-6 transition-colors duration-300 hover:bg-white lg:p-7'
+                  >
+                    <span className='grid size-11 place-items-center rounded-xl bg-accent-soft text-accent'>
+                      <Icon className='size-5' strokeWidth={1.6} aria-hidden />
+                    </span>
+                    <h3 className='mt-8 text-[17px] leading-snug font-medium tracking-[-0.01em]'>{name}</h3>
+                    <p className='mt-2 text-[14px] text-muted tabular-nums'>
+                      {count} product{count === 1 ? '' : 's'}
+                    </p>
+                    <span className='mt-6 inline-flex items-center gap-1 text-[14px] font-medium text-ink'>
+                      Explore
+                      <ArrowUpRight
+                        className='size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5'
+                        aria-hidden
+                      />
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        ) : (
+          <p className='mt-12 text-[15px] text-muted'>
+            <Link to='/shop' className='text-ink underline underline-offset-2 hover:text-accent'>
+              Browse the full range in the shop
+            </Link>
+            .
+          </p>
+        )}
       </section>
 
       {/* Featured products */}
@@ -87,7 +151,7 @@ export default function HomePage() {
           <SectionHeading
             eyebrow='In the shop'
             title='Equipment our customers order most'
-            lead='Add to your cart and send one order request. Our sales team confirms pricing, stock and delivery with you.'
+            lead='Add items to your quote list and send one quote request. Our sales team replies with a proforma confirming pricing, stock and delivery.'
             action={
               <Link to='/shop' className='inline-flex items-center gap-1.5 text-[15px] font-medium text-ink hover:text-accent'>
                 View all {products.length > 0 && <span className='text-muted tabular-nums'>({products.length})</span>}
@@ -95,11 +159,31 @@ export default function HomePage() {
               </Link>
             }
           />
-          <div className='mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4'>
-            {loading
-              ? Array.from({ length: 8 }, (_, i) => <ProductCardSkeleton key={i} />)
-              : featured.map(p => <ProductCard key={p.slug} product={p} />)}
-          </div>
+          {error ? (
+            <div role='alert' className='mt-12 rounded-2xl border border-warn/30 bg-white p-8'>
+              <p className='font-medium'>We couldn't load the catalogue just now.</p>
+              <p className='mt-1 text-[14.5px] text-muted'>
+                Try again in a moment, or call{' '}
+                <a href={telHref(COMPANY.phones[0])} className='text-ink underline underline-offset-2 tabular-nums'>
+                  {COMPANY.phones[0]}
+                </a>{' '}
+                and we will help you directly.
+              </p>
+              <button
+                type='button'
+                onClick={reload}
+                className='mt-5 inline-flex h-11 items-center rounded-full bg-accent px-5 text-[14.5px] text-white hover:bg-accent-deep'
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            <div className='mt-12 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4'>
+              {loading
+                ? Array.from({ length: 8 }, (_, i) => <ProductCardSkeleton key={i} />)
+                : featured.map(p => <ProductCard key={p.slug} product={p} />)}
+            </div>
+          )}
         </div>
       </section>
 
@@ -151,9 +235,15 @@ export default function HomePage() {
               </p>
             </div>
             <div className='flex flex-col gap-3 sm:flex-row lg:flex-col lg:items-stretch'>
-              <LinkButton to='/contact?subject=Quotation' size='lg' flip>
-                Request a quotation <ArrowRight className='size-4' aria-hidden />
+              <LinkButton to='/quote' size='lg' flip>
+                Request a quote <ArrowRight className='size-4' aria-hidden />
               </LinkButton>
+              <Link
+                to='/contact?topic=tender'
+                className='inline-flex h-13 items-center justify-center rounded-full border border-white/20 px-7 text-[16px] transition-colors hover:border-white/50 sm:h-14'
+              >
+                Send a tender or list
+              </Link>
               <a
                 href={telHref(COMPANY.phones[0])}
                 className='inline-flex h-13 items-center justify-center rounded-full border border-white/20 px-7 text-[16px] tabular-nums transition-colors hover:border-white/50 sm:h-14'

@@ -30,6 +30,10 @@ export type Customer = {
   phone: string
   address: string
   notes: string
+  /** The buyer's own tender, LPO or PO reference. */
+  reference: string
+  /** Tax identification number (TIN). */
+  taxId: string
 }
 
 export type ProductRequest = {
@@ -42,7 +46,24 @@ export type ProductRequest = {
 
 export type RequestReceipt = { reference: string; mode: 'api' | 'offline' }
 
-export type Enquiry = { name: string; email: string; phone?: string; subject: string; message: string }
+export const ENQUIRY_TOPICS = ['general', 'quotation', 'sourcing', 'repairs', 'tender', 'other'] as const
+export type EnquiryTopic = (typeof ENQUIRY_TOPICS)[number]
+
+export type Enquiry = {
+  /** One key per submission, reused on retry so a message is never recorded twice. */
+  submissionKey: string
+  name: string
+  organisation: string
+  email: string
+  phone: string
+  topic: EnquiryTopic
+  /** Human label of the topic, used in the offline email. */
+  topicLabel: string
+  subject: string
+  message: string
+}
+
+export type EnquiryReceipt = { reference: string | null; mode: 'api' | 'offline' }
 
 /** An error from the management system, with per-field messages when it rejected the form. */
 export class ApiError extends Error {

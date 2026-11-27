@@ -1,6 +1,7 @@
 import { CATALOG } from '@/data/catalog'
+import { COMPANY } from '@/lib/company'
 import { ApiError } from '@/lib/types'
-import type { Enquiry, Product, ProductRequest, RequestReceipt } from '@/lib/types'
+import type { Enquiry, EnquiryReceipt, Product, ProductRequest, RequestReceipt } from '@/lib/types'
 
 /**
  * The one seam between the website and the management system (trans-sas-mgt).
@@ -121,7 +122,7 @@ export function newSubmissionKey() {
 }
 
 const mailto = (subject: string, body: string) => {
-  window.location.href = `mailto:sales@trans-sas.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  window.location.href = `mailto:${COMPANY.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }
 
 export async function submitRequest(req: ProductRequest, names: Record<string, string>): Promise<RequestReceipt> {
@@ -139,6 +140,8 @@ export async function submitRequest(req: ProductRequest, names: Record<string, s
         delivery: req.delivery,
         address: req.delivery === 'delivery' ? customer.address : '',
         notes: customer.notes,
+        reference: customer.reference.trim() || undefined,
+        taxId: customer.taxId.trim() || undefined,
         items: req.lines.map(l => ({ sku: l.sku, quantity: l.qty })),
         // Honeypot: always empty from a real browser.
         website: ''
@@ -160,6 +163,8 @@ export async function submitRequest(req: ProductRequest, names: Record<string, s
       `Fulfilment: ${req.delivery === 'delivery' ? 'Deliver to address' : 'Pick up in Accra'}`,
       `Name: ${customer.name}`,
       customer.organisation ? `Organisation: ${customer.organisation}` : '',
+      customer.reference ? `Tender / PO reference: ${customer.reference}` : '',
+      customer.taxId ? `TIN: ${customer.taxId}` : '',
       `Email: ${customer.email}`,
       `Phone: ${customer.phone}`,
       req.delivery === 'delivery' ? `Address: ${customer.address}` : '',
@@ -172,6 +177,45 @@ export async function submitRequest(req: ProductRequest, names: Record<string, s
   return { reference, mode: 'offline' }
 }
 
-export async function submitEnquiry(enquiry: Enquiry): Promise<void> {
-  mailto(enquiry.subject, `${enquiry.message}\n\n${enquiry.name}\n${enquiry.email}${enquiry.phone ? `\n${enquiry.phone}` : ''}`)
+/**
+ * A contact-form message. With the API it is recorded in the management system and gets a
+ * reference; without it a pre-filled email opens, and the page says so honestly.
+ */
+export async function submitEnquiry(enquiry: Enquiry): Promise<EnquiryReceipt> {
+  if (hasBackend) {
+    const receipt = await request<{ reference: string }>('/enquiries', {
+      method: 'POST',
+      body: JSON.stringify({
+        submissionKey: enquiry.submissionKey,
+        name: enquiry.name.trim(),
+        organisation: enquiry.organisation.trim() || undefined,
+        email: enquiry.email.trim(),
+        phone: enquiry.phone.trim() || undefined,
+        topic: enquiry.topic,
+        subject: enquiry.subject.trim() || undefined,
+        message: enquiry.message.trim(),
+        // Honeypot: always empty from a real browser.
+        website: ''
+      })
+    })
+
+    return { reference: receipt.reference, mode: 'api' }
+  }
+
+  mailto(
+    enquiry.subject.trim() || enquiry.topicLabel,
+    [
+      enquiry.message,
+      '',
+      `Topic: ${enquiry.topicLabel}`,
+      enquiry.name,
+      enquiry.organisation,
+      enquiry.email,
+      enquiry.phone
+    ]
+      .filter(Boolean)
+      .join('\n')
+  )
+
+  return { reference: null, mode: 'offline' }
 }

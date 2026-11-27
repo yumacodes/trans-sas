@@ -1,24 +1,36 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Check, ChevronRight, MessageCircle, ShieldCheck, Truck, Wrench } from 'lucide-react'
+import { ArrowRight, Check, ChevronRight, MessageCircle, Phone, RotateCw } from 'lucide-react'
 import { Button, LinkButton } from '@/components/ui/button'
 import { ProductImage } from '@/components/ui/product-image'
 import { ProductCard } from '@/components/site/product-card'
 import { QtyStepper } from '@/components/site/cart-lines'
+import { TrustBand } from '@/components/site/trust-band'
 import { useCart } from '@/lib/cart'
-import { COMPANY } from '@/lib/company'
+import { COMPANY, telHref, whatsappHref } from '@/lib/company'
+import { usePageMeta } from '@/lib/use-page-meta'
 import { cn } from '@/lib/utils'
 import { useProduct, useProducts } from '@/lib/use-products'
 
 export default function ProductPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { data: product, loading } = useProduct(slug)
+  const { data: product, loading, error, reload } = useProduct(slug)
   const { data: all } = useProducts()
   const { add, setDrawerOpen } = useCart()
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const [shown, setShown] = useState(0)
+
+  usePageMeta(
+    product
+      ? { title: product.name, description: product.summary || product.description || `${product.name} from ${COMPANY.name}, Accra.`, image: product.image }
+      : error
+        ? { title: 'Product unavailable', noindex: true }
+        : loading
+          ? {}
+          : { title: 'Product not found', noindex: true }
+  )
 
   // A new product starts on its first photo, with a quantity of one.
   useEffect(() => {
@@ -34,6 +46,36 @@ export default function ProductPage() {
           <div className='h-4 w-1/4 rounded bg-ink/[0.06]' />
           <div className='h-10 w-3/4 rounded bg-ink/[0.06]' />
           <div className='h-24 rounded bg-ink/[0.06]' />
+        </div>
+      </div>
+    )
+
+  if (error)
+    return (
+      <div className='frame py-24 text-center' role='alert'>
+        <p className='eyebrow'>Connection problem</p>
+        <h1 className='h2 mt-4 font-normal'>We couldn't load this product right now</h1>
+        <p className='mx-auto mt-4 max-w-lg text-muted'>
+          Our catalogue didn't respond. Try again in a moment, or call or WhatsApp us and we will help you directly.
+        </p>
+        <div className='mt-8 flex flex-wrap justify-center gap-3'>
+          <Button onClick={reload}>
+            <RotateCw className='mr-2 size-4' aria-hidden /> Try again
+          </Button>
+          <a
+            href={telHref(COMPANY.phones[0])}
+            className='inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-[15px] tabular-nums hover:border-ink/30'
+          >
+            <Phone className='size-4' aria-hidden /> {COMPANY.phones[0]}
+          </a>
+          <a
+            href={whatsappHref(`Hello, I'm interested in product ${slug?.toUpperCase() ?? ''}.`)}
+            target='_blank'
+            rel='noreferrer'
+            className='inline-flex h-12 items-center gap-2 rounded-full border border-line bg-white px-6 text-[15px] hover:border-ink/30'
+          >
+            <MessageCircle className='size-4' aria-hidden /> WhatsApp us
+          </a>
         </div>
       </div>
     )
@@ -63,10 +105,10 @@ export default function ProductPage() {
 
   const handleBuyNow = () => {
     add(product.slug, qty)
-    navigate('/checkout')
+    navigate('/quote/send')
   }
 
-  const whatsapp = `${COMPANY.whatsapp}?text=${encodeURIComponent(`Hello, I'm interested in the ${product.name}.`)}`
+  const whatsapp = whatsappHref(`Hello, I'm interested in the ${product.name} (${product.sku}).`)
 
   return (
     <>
@@ -105,6 +147,7 @@ export default function ProductPage() {
             src={product.images[shown] ?? product.image}
             alt={product.name}
             eager
+            sizes='(min-width: 1024px) 50vw, 100vw'
             className='aspect-square rounded-3xl border border-line/60 bg-gradient-to-b from-white to-[#eceff7]'
           />
           {product.images.length > 1 && (
@@ -118,7 +161,7 @@ export default function ProductPage() {
                     aria-current={i === shown}
                     className={cn('block overflow-hidden rounded-xl border-2', i === shown ? 'border-accent' : 'border-transparent')}
                   >
-                    <ProductImage src={src} alt='' className='size-16 rounded-lg' />
+                    <ProductImage src={src} alt='' sizes='64px' className='size-16 rounded-lg' />
                   </button>
                 </li>
               ))}
@@ -149,7 +192,7 @@ export default function ProductPage() {
               ))}
           </dl>
           <p className='mt-4 text-[14.5px] text-muted'>
-            Price on request. Add it to your cart and send the request: we reply with a proforma invoice.
+            Price on request. Add it to your quote list and send the request: we reply with a proforma invoice.
           </p>
 
           <div className='mt-6 flex flex-wrap items-center gap-3'>
@@ -160,11 +203,11 @@ export default function ProductPage() {
                   <Check className='mr-2 size-4' aria-hidden /> Added
                 </>
               ) : (
-                'Add to cart'
+                'Add to quote'
               )}
             </Button>
             <Button onClick={handleBuyNow} variant='dark' size='lg' className='flex-1 sm:flex-none'>
-              Request now
+              Request quote now
             </Button>
           </div>
           <a href={whatsapp} target='_blank' rel='noreferrer' className='mt-4 inline-flex items-center gap-2 text-[14.5px] text-ink hover:text-accent'>
@@ -190,19 +233,7 @@ export default function ProductPage() {
           </div>
           )}
 
-          <ul className='mt-8 grid gap-3 sm:grid-cols-3'>
-            {[
-              { icon: Truck, title: 'Free delivery', body: 'On equipment orders' },
-              { icon: Wrench, title: 'Repairs', body: 'Servicing after purchase' },
-              { icon: ShieldCheck, title: 'Since 1981', body: 'Trusted by hospitals' }
-            ].map(({ icon: Icon, title, body }) => (
-              <li key={title} className='rounded-2xl bg-white/70 p-4'>
-                <Icon className='size-5 text-accent' strokeWidth={1.6} aria-hidden />
-                <p className='mt-3 text-[14.5px] font-medium'>{title}</p>
-                <p className='text-[13px] text-muted'>{body}</p>
-              </li>
-            ))}
-          </ul>
+          <TrustBand generic className='mt-8' />
         </div>
       </section>
 
@@ -210,9 +241,14 @@ export default function ProductPage() {
         <section className='border-t border-line/70 bg-white/50'>
           <div className='frame py-16 lg:py-20'>
             <div className='flex items-end justify-between gap-4'>
-              <h2 className='text-[clamp(1.5rem,1.2rem+1vw,2rem)] font-normal tracking-[-0.025em]'>Often ordered alongside</h2>
-              <Link to='/shop' className='inline-flex items-center gap-1.5 text-[14.5px] font-medium hover:text-accent'>
-                <ArrowLeft className='size-4' aria-hidden /> Back to shop
+              <h2 className='text-[clamp(1.5rem,1.2rem+1vw,2rem)] font-normal tracking-[-0.025em]'>
+                {product.category ? `More in ${product.category}` : 'More equipment'}
+              </h2>
+              <Link
+                to={product.category ? `/shop?category=${encodeURIComponent(product.category)}` : '/shop'}
+                className='inline-flex items-center gap-1.5 text-[14.5px] font-medium hover:text-accent'
+              >
+                View all <ArrowRight className='size-4' aria-hidden />
               </Link>
             </div>
             <div className='mt-10 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 lg:grid-cols-4'>

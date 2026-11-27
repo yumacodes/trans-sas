@@ -5,13 +5,15 @@ import { ArrowRight, Menu, ShoppingBag, X } from 'lucide-react'
 import { LinkButton } from '@/components/ui/button'
 import { Logo } from '@/components/site/logo'
 import { useCart } from '@/lib/cart'
+import { hasTeam } from '@/data/team'
 import { cn } from '@/lib/utils'
 
 export const NAV_LINKS = [
   { label: 'Home', to: '/' },
+  { label: 'Shop', to: '/shop' },
   { label: 'Services', to: '/services' },
   { label: 'About', to: '/about' },
-  { label: 'Team', to: '/team' },
+  ...(hasTeam ? [{ label: 'Team', to: '/team' }] : []),
   { label: 'Contact', to: '/contact' }
 ]
 
@@ -19,6 +21,8 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const wrapRef = useRef<HTMLElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
   const { count, setDrawerOpen } = useCart()
   const { pathname } = useLocation()
@@ -26,6 +30,36 @@ export function Navbar() {
   useEffect(() => {
     setOpen(false)
   }, [pathname])
+
+  // Mobile menu: focus moves into it on open; Escape or a tap outside closes it and focus
+  // goes back to the toggle.
+  useEffect(() => {
+    if (!open) return
+
+    const frame = requestAnimationFrame(() => menuRef.current?.querySelector<HTMLElement>('a[href]')?.focus())
+
+    const close = () => {
+      setOpen(false)
+      toggleRef.current?.focus()
+    }
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close()
+    }
+
+    const onPointer = (e: PointerEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false)
+    }
+
+    window.addEventListener('keydown', onKey)
+    document.addEventListener('pointerdown', onPointer)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('pointerdown', onPointer)
+    }
+  }, [open])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -84,7 +118,7 @@ export function Navbar() {
               <button
                 type='button'
                 onClick={() => setDrawerOpen(true)}
-                aria-label={count ? `Open cart, ${count} item${count === 1 ? '' : 's'}` : 'Open cart'}
+                aria-label={count ? `Open your quote list, ${count} item${count === 1 ? '' : 's'}` : 'Open your quote list'}
                 className='relative grid size-11 place-items-center rounded-full text-ink transition-colors hover:bg-ink/5'
               >
                 <ShoppingBag className='size-5' strokeWidth={1.6} aria-hidden />
@@ -94,11 +128,12 @@ export function Navbar() {
                   </span>
                 )}
               </button>
-              <LinkButton to='/shop' flip className='h-10 px-4 text-[14.5px] sm:h-12 sm:px-6 sm:text-[15px]'>
-                Request items
+              <LinkButton to='/quote' flip className='h-10 px-4 text-[14.5px] sm:h-12 sm:px-6 sm:text-[15px]'>
+                Request a quote
                 <ArrowRight className='hidden size-4 sm:block' strokeWidth={1.8} aria-hidden />
               </LinkButton>
               <button
+                ref={toggleRef}
                 type='button'
                 aria-label={open ? 'Close menu' : 'Open menu'}
                 aria-expanded={open}
@@ -106,7 +141,7 @@ export function Navbar() {
                 onClick={() => setOpen(v => !v)}
                 className='grid size-11 place-items-center rounded-full text-ink lg:hidden'
               >
-                {open ? <X className='size-5' strokeWidth={1.6} /> : <Menu className='size-5' strokeWidth={1.6} />}
+                {open ? <X className='size-5' strokeWidth={1.6} aria-hidden /> : <Menu className='size-5' strokeWidth={1.6} aria-hidden />}
               </button>
             </div>
           </nav>
@@ -114,6 +149,7 @@ export function Navbar() {
           <AnimatePresence initial={false}>
             {open && (
               <m.div
+                ref={menuRef}
                 id='mobile-menu'
                 initial={reduce ? false : { opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}

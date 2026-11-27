@@ -2,10 +2,13 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { CheckCircle2, Loader2, MapPin, Truck } from 'lucide-react'
+import { CopyButton } from '@/components/ui/copy-button'
+import { TrustBand } from '@/components/site/trust-band'
+import { usePageMeta } from '@/lib/use-page-meta'
 import { Button, LinkButton } from '@/components/ui/button'
 import { InputField, TextareaField } from '@/components/ui/field'
 import { PageHeader } from '@/components/site/layout'
-import { useResolvedCart } from '@/components/site/cart-lines'
+import { CatalogueError, useResolvedCart } from '@/components/site/cart-lines'
 import { OrderSummary } from '@/components/site/order-summary'
 import { newSubmissionKey, submitRequest } from '@/lib/api'
 import { useCart } from '@/lib/cart'
@@ -16,7 +19,10 @@ import { cn } from '@/lib/utils'
 
 type Errors = Partial<Record<keyof Customer, string>>
 
-const EMPTY: Customer = { name: '', organisation: '', email: '', phone: '', address: '', notes: '' }
+const EMPTY: Customer = { name: '', organisation: '', email: '', phone: '', address: '', notes: '', reference: '', taxId: '' }
+
+/** What was sent, kept for the confirmation page (the list itself is cleared on success). */
+type Sent = RequestReceipt & { items: { name: string; sku: string; qty: number }[]; email: string; phone: string }
 
 const validate = (c: Customer, delivery: 'delivery' | 'pickup'): Errors => {
   const e: Errors = {}
@@ -25,19 +31,22 @@ const validate = (c: Customer, delivery: 'delivery' | 'pickup'): Errors => {
   if (!/^\S+@\S+\.\S+$/.test(c.email.trim())) e.email = 'Enter an email address like name@example.com.'
   if (c.phone.replace(/\D/g, '').length < 9) e.phone = 'Enter a phone number we can reach you on.'
   if (delivery === 'delivery' && c.address.trim().length < 5) e.address = 'Enter the delivery address, with a landmark or GPS code.'
+  if (c.reference.trim().length > 80) e.reference = 'Keep the reference to 80 characters or fewer.'
+  if (c.taxId.trim().length > 40) e.taxId = 'Keep the TIN to 40 characters or fewer.'
 
   return e
 }
 
 export default function CheckoutPage() {
+  usePageMeta({ title: 'Request a quote', description: 'Send your quote list. We reply with a proforma invoice showing prices and availability.', noindex: true })
   const { clear } = useCart()
-  const { lines, loading } = useResolvedCart()
+  const { lines, saved, loading, error, reload } = useResolvedCart()
   const [customer, setCustomer] = useState<Customer>(EMPTY)
   const [delivery, setDelivery] = useState<'delivery' | 'pickup'>('delivery')
   const [errors, setErrors] = useState<Errors>({})
   const [submitting, setSubmitting] = useState(false)
   const [failure, setFailure] = useState<string | null>(null)
-  const [receipt, setReceipt] = useState<RequestReceipt | null>(null)
+  const [receipt, setReceipt] = useState<Sent | null>(null)
   // One key for this submission: retrying after a dropped connection can't create a second proforma.
   const [submissionKey] = useState(newSubmissionKey)
 
@@ -70,7 +79,12 @@ export default function CheckoutPage() {
         Object.fromEntries(lines.map(l => [l.product.sku, l.product.name]))
       )
 
-      setReceipt(result)
+      setReceipt({
+        ...result,
+        items: lines.map(l => ({ name: l.product.name, sku: l.product.sku, qty: l.qty })),
+        email: customer.email.trim(),
+        phone: customer.phone.trim()
+      })
       clear()
       window.scrollTo({ top: 0 })
     } catch (error) {
@@ -98,15 +112,35 @@ export default function CheckoutPage() {
         <span className='grid size-16 place-items-center rounded-full bg-accent-soft text-accent'>
           <CheckCircle2 className='size-8' strokeWidth={1.5} aria-hidden />
         </span>
-        <p className='eyebrow mt-8'>Reference {receipt.reference}</p>
+        <div className='mt-8 flex flex-wrap items-center justify-center gap-3'>
+          <p className='eyebrow'>Reference {receipt.reference}</p>
+          <CopyButton value={receipt.reference} label='reference'>
+            Copy reference
+          </CopyButton>
+        </div>
         <h1 className='h2 mt-4 max-w-xl font-normal' role='status'>
-          {receipt.mode === 'api' ? 'Request received. Thank you.' : 'Almost there: send the email to finish.'}
+          {receipt.mode === 'api' ? 'Quote request received. Thank you.' : 'Almost there: send the email to finish.'}
         </h1>
         <p className='mt-5 max-w-lg text-[17px] leading-relaxed text-muted'>
           {receipt.mode === 'api'
-            ? 'Our sales team is preparing your proforma invoice with prices and availability, and will send it to your email. Quote this reference if you call us.'
-            : `Your email app has opened with the request filled in. Send it to ${COMPANY.email} and our sales team will confirm pricing and delivery.`}
+            ? `Our sales team will prepare a proforma invoice with prices and availability and contact you at ${receipt.email} or ${receipt.phone}${
+                COMPANY.replyTime ? `, ${COMPANY.replyTime}` : ''
+              }. Quote this reference if you call us.`
+            : `Your email app has opened with the request filled in. Send it to ${COMPANY.email} and our sales team will contact you at ${receipt.email} or ${receipt.phone}.`}
         </p>
+
+        <div className='mt-10 w-full max-w-lg rounded-2xl border border-line bg-white p-6 text-left'>
+          <h2 className='text-[15px] font-medium'>What you asked us to quote</h2>
+          <ul className='mt-4 space-y-2.5 text-[14.5px]'>
+            {receipt.items.map(item => (
+              <li key={item.sku} className='flex justify-between gap-4'>
+                <span className='min-w-0'>{item.name}</span>
+                <span className='shrink-0 text-muted tabular-nums'>× {item.qty}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         <div className='mt-10 flex flex-wrap justify-center gap-3'>
           <LinkButton to='/shop'>Keep browsing</LinkButton>
           <LinkButton to='/' variant='outline'>
@@ -116,11 +150,19 @@ export default function CheckoutPage() {
       </div>
     )
 
-  if (!loading && lines.length === 0)
+  if (error && saved.length > 0)
+    return (
+      <div className='frame py-16 lg:py-20'>
+        <h1 className='h2 font-normal'>Request a quote</h1>
+        <CatalogueError count={saved.length} onRetry={reload} className='mt-8 max-w-2xl' />
+      </div>
+    )
+
+  if (saved.length === 0)
     return (
       <div className='frame py-24 text-center'>
-        <h1 className='h2 font-normal'>Your cart is empty</h1>
-        <p className='mt-4 text-muted'>Add equipment to your cart before checking out.</p>
+        <h1 className='h2 font-normal'>Your quote list is empty</h1>
+        <p className='mt-4 text-muted'>Add equipment to your quote list first, then send one request for everything.</p>
         <LinkButton to='/shop' className='mt-8'>
           Browse equipment
         </LinkButton>
@@ -130,8 +172,8 @@ export default function CheckoutPage() {
   return (
     <>
       <PageHeader
-        eyebrow='Request a proforma'
-        title='Send your request'
+        eyebrow='Request a quote'
+        title='Send your quote request'
         lead='Nothing is paid online. We prepare a proforma invoice with prices and availability, and send it to you.'
       />
       <form noValidate onSubmit={handleSubmit} className='frame grid gap-10 py-10 lg:grid-cols-[1fr_400px] lg:gap-14 lg:py-14'>
@@ -176,7 +218,7 @@ export default function CheckoutPage() {
             <legend className='text-[19px] font-medium tracking-[-0.01em]'>2. Delivery</legend>
             <div role='radiogroup' className='mt-6 grid gap-3 sm:grid-cols-2'>
               {[
-                { value: 'delivery' as const, title: 'Deliver to me', body: 'Free delivery to your facility or home.', icon: Truck },
+                { value: 'delivery' as const, title: 'Deliver to me', body: `Free delivery to your facility or home. ${COMPANY.deliveryNote}`, icon: Truck },
                 { value: 'pickup' as const, title: 'Pick up in Accra', body: 'Abossey Okai, near Obetsebi-Lamptey Circle.', icon: MapPin }
               ].map(({ value, title, body, icon: Icon }) => (
                 <label
@@ -212,18 +254,42 @@ export default function CheckoutPage() {
           </fieldset>
 
           <fieldset>
-            <legend className='text-[19px] font-medium tracking-[-0.01em]'>3. Anything else</legend>
-            <div className='mt-6'>
+            <legend className='text-[19px] font-medium tracking-[-0.01em]'>3. References and notes</legend>
+            <div className='mt-6 grid gap-5 sm:grid-cols-2'>
+              <InputField
+                label='Tender / PO reference'
+                name='reference'
+                optional
+                maxLength={80}
+                hint='Your tender, LPO or purchase order number, if you have one.'
+                value={customer.reference}
+                onChange={set('reference')}
+                error={errors.reference}
+              />
+              <InputField
+                label='TIN'
+                name='taxId'
+                optional
+                maxLength={40}
+                hint='Tax identification number to show on the proforma.'
+                value={customer.taxId}
+                onChange={set('taxId')}
+                error={errors.taxId}
+              />
+            </div>
+            <div className='mt-5'>
               <TextareaField
                 label='Notes for our sales team'
                 name='notes'
                 optional
-                hint='Tender reference, preferred delivery date, or questions about a product.'
+                hint='Preferred delivery date, or questions about a product.'
                 value={customer.notes}
                 onChange={set('notes')}
               />
             </div>
           </fieldset>
+
+          <TrustBand />
         </div>
 
         <OrderSummary showLines>
@@ -238,11 +304,11 @@ export default function CheckoutPage() {
                 <Loader2 className='mr-2 size-4 animate-spin' aria-hidden /> Sending request…
               </>
             ) : (
-              'Send request'
+              'Send quote request'
             )}
           </Button>
           <p className='mt-4 text-center text-[13px] leading-relaxed text-muted'>
-            By sending, you agree to be contacted about this request. <Link to='/cart' className='underline underline-offset-2 hover:text-ink'>Edit cart</Link>
+            By sending, you agree to be contacted about this request. <Link to='/quote' className='underline underline-offset-2 hover:text-ink'>Edit list</Link>
           </p>
         </OrderSummary>
       </form>

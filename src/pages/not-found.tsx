@@ -1,6 +1,9 @@
 import { LinkButton } from '@/components/ui/button'
+import { usePageMeta } from '@/lib/use-page-meta'
 
 export default function NotFoundPage() {
+  usePageMeta({ title: 'Page not found', noindex: true })
+
   return (
     <div className='frame flex flex-col items-center py-28 text-center'>
       <p className='eyebrow'>404</p>

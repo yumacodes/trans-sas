@@ -17,6 +17,8 @@ import type { MotionValue } from 'motion/react'
 import { ArrowRight, ArrowUpRight, ChevronLeft, ChevronRight, Pause, Play, ShieldCheck, Truck, Wrench } from 'lucide-react'
 import { FlipLabel, LinkButton } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { COMPANY } from '@/lib/company'
+import { DeliveryNote } from '@/components/site/trust-band'
 import type { Product } from '@/lib/types'
 
 /**
@@ -227,6 +229,8 @@ function StageCard({ product, index, count, rotation, active, onSelect }: StageC
               src={product.image ?? ''}
               alt=''
               draggable={false}
+              width={800}
+              height={1000}
               loading='eager'
               decoding='async'
               className='product-shot size-full object-contain p-[12%]'
@@ -383,9 +387,9 @@ function ProductStage({ products }: { products: Product[] }) {
 
         {/* Small facts that pop in once, then drift with the stage. */}
         <m.div
-          initial={reduce ? false : { opacity: 0, scale: 0.9, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.9, duration: 0.6, ease: EASE }}
+          initial={reduce ? false : { scale: 0.96, y: 6 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE }}
           className='glass-card absolute top-[9%] left-[2%] z-[200] hidden items-center gap-3 rounded-2xl px-4 py-3 sm:flex'
         >
           <span className='grid size-9 place-items-center rounded-xl bg-accent-soft text-accent'>
@@ -393,13 +397,13 @@ function ProductStage({ products }: { products: Product[] }) {
           </span>
           <span className='text-[13px] leading-tight'>
             <span className='block font-semibold text-ink'>Free delivery</span>
-            <span className='text-muted'>On equipment orders</span>
+            <span className='block max-w-[13rem] text-muted'>{COMPANY.deliveryNote}</span>
           </span>
         </m.div>
         <m.div
-          initial={reduce ? false : { opacity: 0, scale: 0.9, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 1.15, duration: 0.6, ease: EASE }}
+          initial={reduce ? false : { scale: 0.96, y: 6 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: EASE }}
           className='glass-card absolute top-[4%] right-[4%] z-[200] hidden items-center gap-3 rounded-2xl px-4 py-3 md:flex'
         >
           <span className='grid size-9 place-items-center rounded-xl bg-accent-soft text-accent'>
@@ -504,10 +508,10 @@ function HeroCopy() {
           <ArrowRight className='size-4' strokeWidth={1.8} aria-hidden />
         </LinkButton>
         <Link
-          to='/contact?subject=Quotation'
+          to='/quote'
           className='flip inline-flex h-13 items-center rounded-full border border-line bg-white/60 px-6 text-[16px] text-ink transition-colors hover:bg-white sm:h-14'
         >
-          <FlipLabel>Request a quotation</FlipLabel>
+          <FlipLabel>Request a quote</FlipLabel>
         </Link>
       </div>
 
@@ -519,17 +523,28 @@ function HeroCopy() {
           </div>
         ))}
       </dl>
+      <DeliveryNote className='mt-4' />
     </div>
   )
 }
 
-export default function ProductStageHero({ products }: { products: Product[] }) {
+/** Holds the stage's place while products load, so the layout doesn't jump. */
+function StageSkeleton() {
   return (
-    <section aria-labelledby='hero-title' className='hero-bg hero-min relative isolate overflow-x-clip'>
+    <div aria-hidden className='relative mx-auto aspect-[3/4] w-full max-w-[720px] sm:aspect-square lg:max-w-none'>
+      <div className='absolute top-[14%] left-1/2 aspect-[4/5] w-[38%] -translate-x-1/2 animate-pulse rounded-3xl bg-ink/[0.06]' />
+    </div>
+  )
+}
+
+/** The copy (and its h1) always renders; the product stage fills in when products arrive. */
+export default function ProductStageHero({ products, loading = false }: { products: Product[]; loading?: boolean }) {
+  return (
+    <section aria-labelledby='hero-title' aria-busy={loading || undefined} className='hero-bg hero-min relative isolate overflow-x-clip'>
       <HeroFloor />
       <div className='frame grid items-center gap-8 pt-6 pb-14 lg:min-h-[inherit] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12 lg:py-10 xl:gap-16'>
         <HeroCopy />
-        <ProductStage products={products} />
+        {loading ? <StageSkeleton /> : <ProductStage products={products} />}
       </div>
     </section>
   )

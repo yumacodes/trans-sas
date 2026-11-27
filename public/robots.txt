@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /quote
+Disallow: /cart
+Disallow: /checkout
+
+Sitemap: https://www.trans-sas.com/sitemap.xml

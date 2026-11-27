@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Static routes only. Product pages (/shop/<item-code>) come from the management system at
+  runtime, so they cannot be listed here; generate them at build/deploy time from
+  GET /api/v1/public/products if product URLs should be submitted to search engines.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.trans-sas.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://www.trans-sas.com/shop</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.trans-sas.com/services</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.trans-sas.com/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.trans-sas.com/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+</urlset>

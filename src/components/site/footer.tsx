@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
 import { ArrowUpRight, Instagram, Mail, MapPin, Phone, Youtube } from 'lucide-react'
 import { Logo } from '@/components/site/logo'
+import { hasTeam } from '@/data/team'
 import { COMPANY, telHref } from '@/lib/company'
 import { categoriesOf, useProducts } from '@/lib/use-products'
 
-function XMark(props: { className?: string }) {
+function XMark(props: { className?: string; 'aria-hidden'?: boolean }) {
   return (
     <svg viewBox='0 0 24 24' aria-hidden {...props}>
       <path
@@ -43,7 +44,7 @@ export function Footer() {
                   aria-label={label}
                   className='grid size-11 place-items-center rounded-full border border-white/15 text-white/80 transition-colors hover:border-white/40 hover:text-white'
                 >
-                  <Icon className='size-[18px]' />
+                  <Icon className='size-[18px]' aria-hidden />
                 </a>
               </li>
             ))}
@@ -73,11 +74,10 @@ export function Footer() {
           <ul className='mt-5 space-y-3 text-[15px]'>
             {[
               ['About us', '/about'],
-              ['Our team', '/team'],
+              ...(hasTeam ? [['Our team', '/team']] : []),
               ['Services', '/services'],
               ['Contact', '/contact'],
-              ['Request a quotation', '/contact?subject=Quotation'],
-              ['Your cart', '/cart']
+              ['Request a quote', '/quote']
             ].map(([label, to]) => (
               <li key={to}>
                 <Link to={to} className='text-white/80 hover:text-white'>
